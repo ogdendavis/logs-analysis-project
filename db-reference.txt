@@ -24,18 +24,6 @@ Indexes:
 Foreign-key constraints:
 "articles_author_fkey" FOREIGN KEY (author) REFERENCES authors(id)
 
-Authors Table Structure:
-Table "public.authors"
- Column |  Type   |                      Modifiers
---------+---------+------------------------------------------------------
- name   | text    | not null
- bio    | text    |
- id     | integer | not null default nextval('authors_id_seq'::regclass)
-Indexes:
-    "authors_pkey" PRIMARY KEY, btree (id)
-Referenced by:
-    TABLE "articles" CONSTRAINT "articles_author_fkey" FOREIGN KEY (author) REFERENCES authors(id)
-
 Log Table Structure:
 Table "public.log"
  Column |           Type           |                    Modifiers
@@ -48,3 +36,15 @@ Table "public.log"
  id     | integer                  | not null default nextval('log_id_seq'::regclass)
 Indexes:
     "log_pkey" PRIMARY KEY, btree (id)
+
+Authors Table Structure:
+Table "public.authors"
+ Column |  Type   |                      Modifiers
+--------+---------+------------------------------------------------------
+ name   | text    | not null
+ bio    | text    |
+ id     | integer | not null default nextval('authors_id_seq'::regclass)
+Indexes:
+    "authors_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "articles" CONSTRAINT "articles_author_fkey" FOREIGN KEY (author) REFERENCES authors(id)
