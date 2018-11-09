@@ -2,39 +2,26 @@ import psycopg2
 
 DB = "news"
 
-def list_logs():
+def top_articles():
+    # Connect to database and activate cursor
     conn = psycopg2.connect(dbname=DB)
     cur = conn.cursor()
-    #cur.execute("select articles.slug, log.path from articles, log where log.path like '%candidate%' limit 10")
-    cur.execute("select path, id, ip from log where path like '%balloon%' limit 10")
-    rows = cur.fetchall()
+    # SQL query joins articles and log where the log path matches the slug from
+    # the article table. It then groups the results by the article title and
+    # displays the title and number of views for the top 5 most-viewed articles
+    cur.execute("select articles.title, count(*) as views from log join articles on log.path = concat('/article/',articles.slug) group by articles.title order by views desc limit 5")
+    result = cur.fetchall()
+    # Close connections to database
     cur.close()
     conn.close()
-    return rows
-
-def list_articles():
-    conn = psycopg2.connect(dbname=DB)
-    cur = conn.cursor()
-    cur.execute("select title, slug, id from articles where slug like '%balloon%' limit 10")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
-
-def popular_articles():
-    conn = psycopg2.connect(dbname=DB)
-    cur = conn.cursor()
-    cur.execute("select article.title, count(*) from articles, log where log.path =  limit 10")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
-
-def art_log_join():
-    conn = psycopg2.connect(dbname=DB)
-    cur = conn.cursor()
-    cur.execute("select articles.title, log.path from log join articles on log.path = concat('/article/',articles.slug) limit 10")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
+    # Format the output so that it's easy to read, including title and space
+    # above and below the result. Minimum title length of 40 is sufficient in
+    # this dataset to give the result as a nice readable table. If future
+    # articles have longer titles, it's easy to change the '40' below to a
+    # larger number.
+    print("\n")
+    print("Top 5 most-viewed articles:")
+    for article in result:
+        print("{0:.<40} {1:,} views".format(article[0], article[1]))
+    print("\n")
+    return
