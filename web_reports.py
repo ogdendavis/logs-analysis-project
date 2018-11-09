@@ -2,6 +2,12 @@ import psycopg2
 
 DB = "news"
 
+def report():
+    # Run all reports in one easy command!
+    top_articles()
+    top_authors()
+    return
+
 def top_articles():
     # Connect to database and activate cursor
     conn = psycopg2.connect(dbname=DB)
