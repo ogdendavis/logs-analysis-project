@@ -26,11 +26,10 @@ def top_articles():
     # this dataset to give the result as a nice readable table. If future
     # articles have longer titles, it's easy to change the '40' below to a
     # larger number.
-    print("\n")
+    print("")
     print("Top articles by page views:")
     for article in result:
         print("{0:.<40} {1:,} views".format(article[0], article[1]))
-    print("\n")
     return
 
 def top_authors():
@@ -48,11 +47,10 @@ def top_authors():
     conn.close()
     # Formatting is the same as for top_articles, with shorter min length for
     # author name
-    print("\n")
+    print("")
     print("Top authors by page views:")
     for author in result:
         print("{0:.<30} {1:,} views".format(author[0], author[1]))
-    print("\n")
     return
 
 def high_errors():
@@ -80,11 +78,12 @@ def high_errors():
     for day in result:
         if day[1] >= 0.01:
             the_one_percent.append(day)
-    print("\n")
+    print("")
     print("Days with high http error rate:")
+    # Format the error rate as a readable percent, and convert the date object
+    # to a string, again in a readable format.
     for day in the_one_percent:
         err_rate = day[1] * 100
         date = day[0].strftime('%Y-%m-%d')
         print("{0} - {1:.2f}%".format(date, err_rate))
-    print("\n")
     return
