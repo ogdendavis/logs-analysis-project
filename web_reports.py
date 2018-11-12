@@ -2,12 +2,14 @@ import psycopg2
 
 DB = "news"
 
+
 def report():
     # Run all reports in one easy command!
     top_articles()
     top_authors()
     high_errors()
     return
+
 
 def top_articles():
     # Connect to database and activate cursor
@@ -36,14 +38,15 @@ def top_articles():
         print("{0:.<40} {1:,} views".format(article[0], article[1]))
     return
 
+
 def top_authors():
     # Connect to database and cursor
     conn = psycopg2.connect(dbname=DB)
     cur = conn.cursor()
     # Query joins all 3 tables by linking article slug to path in web log, and
-    # linking the article's author field to the author id. The result is limited
-    # to the top 5 authors (same as for top_articles), but that's irrelevant in
-    # the current data set, as there are only 4 authors!
+    # linking the article's author field to the author id. The result is
+    # limited to the top 5 authors (same as for top_articles), but that's
+    # irrelevant in the current data set, as there are only 4 authors!
     cur.execute("""SELECT authors.name, COUNT(*) AS views
                    FROM log JOIN articles
                    ON log.path = CONCAT('/article/',articles.slug)
@@ -63,35 +66,38 @@ def top_authors():
         print("{0:.<30} {1:,} views".format(author[0], author[1]))
     return
 
+
 def high_errors():
     conn = psycopg2.connect(dbname=DB)
     cur = conn.cursor()
     # I split the query into parts, to make it (slightly more) intelligible.
-    # This inner query first strips down the timestamps so that they just report
-    # day, month, and year, allowing us to group logs by date. Then it creates
-    # two counts, one for the total requests in a day, and the other for errors
-    # in that day. Finally, it groups the rows by date.
+    # This inner query first strips down the timestamps so that they just
+    # report day, month, and year, allowing us to group logs by date. Then it
+    # creates two counts, one for the total requests in a day, and the other
+    # for errors in that day. Finally, it groups the rows by date.
     inner_query = """SELECT
                         date_trunc('day', time) AS date,
                         COUNT(1) AS requests,
-                        COUNT(CASE status WHEN '200 OK' THEN null ELSE 1 END) AS errors
+                        COUNT(CASE status WHEN '200 OK' THEN null ELSE 1 END)
+                            AS errors
                     FROM log GROUP BY date"""
     # The outer query uses the inner query (above) to retrieve dates, total
     # requests, and errors. It then calculates errors as a percentage of total
     # requests and orders the results by that percentage.
     cur.execute("""SELECT
                        date,
-                       CAST(errors AS float) / CAST(requests AS float) AS error_rate
+                       CAST(errors AS float) / CAST(requests AS float)
+                         AS error_rate
                    FROM ({}) AS subquery
                    ORDER BY error_rate DESC""".format(inner_query))
     result = cur.fetchall()
     cur.close()
     conn.close()
     # I failed to find a way to get the queries above to only return dates with
-    # an error rate at or above 1%. I feel certain that this is an easy thing to
-    # do, and that I have simply failed to figure it out. Be that as it may, I
-    # know I've gotten the report down to a manageable size with this data set,
-    # so I'm saying, "screw it" and doing the last filter in Python.
+    # an error rate at or above 1%. I feel certain that this is an easy thing
+    # to do, and that I have simply failed to figure it out. Be that as it may,
+    # I know I've gotten the report down to a manageable size with this data
+    # set, so I'm saying, "screw it" and doing the last filter in Python.
     the_one_percent = []
     for day in result:
         if day[1] >= 0.01:
