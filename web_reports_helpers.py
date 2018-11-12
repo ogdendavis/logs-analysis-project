@@ -37,3 +37,12 @@ def test():
     cur.close()
     conn.close()
     return rows
+
+def err_by_date():
+    conn = psycopg2.connect(dbname=DB)
+    cur = conn.cursor()
+    cur.execute("select date_trunc('day', time) as date, count(*) as errs from log where status != '200 OK' group by date order by errs desc")
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    return result

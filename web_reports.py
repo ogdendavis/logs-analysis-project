@@ -6,6 +6,7 @@ def report():
     # Run all reports in one easy command!
     top_articles()
     top_authors()
+    high_errors()
     return
 
 def top_articles():
@@ -51,5 +52,39 @@ def top_authors():
     print("Top authors by page views:")
     for author in result:
         print("{0:.<30} {1:,} views".format(author[0], author[1]))
+    print("\n")
+    return
+
+def high_errors():
+    conn = psycopg2.connect(dbname=DB)
+    cur = conn.cursor()
+    # I split the query into parts, to make it (slightly more) intelligible.
+    # This inner query first strips down the timestamps so that they just report
+    # day, month, and year, allowing us to group logs by date. Then it creates
+    # two counts, one for the total requests in a day, and the other for errors
+    # in that day. Finally, it groups the rows by date.
+    inner_query = "select date_trunc('day', time) as date, count(1) as requests, count(case status when '200 OK' then null else 1 end) as errors from log group by date"
+    # The outer query uses the inner query (above) to retrieve dates, total
+    # requests, and errors. It then calculates errors as a percentage of total
+    # requests and orders the results by that percentage.
+    cur.execute("select date, cast(errors as float) / cast(requests as float) as error_rate from ({}) as subquery order by error_rate desc ".format(inner_query))
+    result = cur.fetchall()
+    cur.close()
+    conn.close()
+    # I failed to find a way to get the queries above to only return dates with
+    # an error rate at or above 1%. I feel certain that this is an easy thing to
+    # do, and that I have simply failed to figure it out. Be that as it may, I
+    # know I've gotten the report down to a manageable size with this data set,
+    # so I'm saying, "screw it" and doing the last filter in Python.
+    the_one_percent = []
+    for day in result:
+        if day[1] >= 0.01:
+            the_one_percent.append(day)
+    print("\n")
+    print("Days with high http error rate:")
+    for day in the_one_percent:
+        err_rate = day[1] * 100
+        date = day[0].strftime('%Y-%m-%d')
+        print("{0} - {1:.2f}%".format(date, err_rate))
     print("\n")
     return
