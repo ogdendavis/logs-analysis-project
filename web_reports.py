@@ -16,7 +16,11 @@ def top_articles():
     # SQL query joins articles and log where the log path matches the slug from
     # the article table. It then groups the results by the article title and
     # displays the title and number of views for the top 5 most-viewed articles
-    cur.execute("select articles.title, count(*) as views from log join articles on log.path = concat('/article/',articles.slug) group by articles.title order by views desc limit 5")
+    cur.execute("""SELECT articles.title, COUNT(*) AS views
+                   FROM log JOIN articles
+                   ON log.path = CONCAT('/article/',articles.slug)
+                   GROUP BY articles.title
+                   ORDER BY views DESC LIMIT 5""")
     result = cur.fetchall()
     # Close connections to database
     cur.close()
@@ -40,7 +44,13 @@ def top_authors():
     # linking the article's author field to the author id. The result is limited
     # to the top 5 authors (same as for top_articles), but that's irrelevant in
     # the current data set, as there are only 4 authors!
-    cur.execute("select authors.name, count(*) as views from log join articles on log.path = concat('/article/',articles.slug) join authors on articles.author = authors.id group by authors.id order by views desc limit 5")
+    cur.execute("""SELECT authors.name, COUNT(*) AS views
+                   FROM log JOIN articles
+                   ON log.path = CONCAT('/article/',articles.slug)
+                       JOIN authors
+                       ON articles.author = authors.id
+                   GROUP BY authors.id
+                   ORDER BY views DESC LIMIT 5""")
     result = cur.fetchall()
     # Close database connections
     cur.close()
@@ -61,11 +71,19 @@ def high_errors():
     # day, month, and year, allowing us to group logs by date. Then it creates
     # two counts, one for the total requests in a day, and the other for errors
     # in that day. Finally, it groups the rows by date.
-    inner_query = "select date_trunc('day', time) as date, count(1) as requests, count(case status when '200 OK' then null else 1 end) as errors from log group by date"
+    inner_query = """SELECT
+                        date_trunc('day', time) AS date,
+                        COUNT(1) AS requests,
+                        COUNT(CASE status WHEN '200 OK' THEN null ELSE 1 END) AS errors
+                    FROM log GROUP BY date"""
     # The outer query uses the inner query (above) to retrieve dates, total
     # requests, and errors. It then calculates errors as a percentage of total
     # requests and orders the results by that percentage.
-    cur.execute("select date, cast(errors as float) / cast(requests as float) as error_rate from ({}) as subquery order by error_rate desc ".format(inner_query))
+    cur.execute("""SELECT
+                       date,
+                       CAST(errors AS float) / CAST(requests AS float) AS error_rate
+                   FROM ({}) AS subquery
+                   ORDER BY error_rate DESC""".format(inner_query))
     result = cur.fetchall()
     cur.close()
     conn.close()
