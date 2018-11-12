@@ -1,0 +1,19 @@
+>>> import web_reports as wr
+>>> wr.report()
+
+Top articles by page views:
+Candidate is jerk, alleges rival........ 338,647 views
+Bears love berries, alleges bear........ 253,801 views
+Bad things gone, say good people........ 170,098 views
+Goats eat Google's lawn................. 84,906 views
+Trouble for troubled troublemakers...... 84,810 views
+
+Top authors by page views:
+Ursula La Multa............... 507,594 views
+Rudolf von Treppenwitz........ 423,457 views
+Anonymous Contributor......... 170,098 views
+Markoff Chaney................ 84,557 views
+
+Days with high http error rate:
+2016-07-17 - 2.26%
+>>>
