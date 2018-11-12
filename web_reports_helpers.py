@@ -1,3 +1,6 @@
+# This file holds helper functions I used while creating the main reports in
+# web_reports
+
 import psycopg2
 
 DB = "news"
