@@ -15,7 +15,11 @@ def report():
 
 def top_articles():
     # Connect to database and activate cursor
-    conn = psycopg2.connect(dbname=DB)
+    try:
+        conn = psycopg2.connect(dbname=DB)
+    except:
+        print("ERROR: Unable to connect to database")
+        return
     cur = conn.cursor()
     # SQL query joins articles and log where the log path matches the slug from
     # the article table. It then groups the results by the article title and
@@ -43,7 +47,11 @@ def top_articles():
 
 def top_authors():
     # Connect to database and cursor
-    conn = psycopg2.connect(dbname=DB)
+    try:
+        conn = psycopg2.connect(dbname=DB)
+    except:
+        print("ERROR: Unable to connect to database")
+        return
     cur = conn.cursor()
     # Query joins all 3 tables by linking article slug to path in web log, and
     # linking the article's author field to the author id. The result is
@@ -70,7 +78,11 @@ def top_authors():
 
 
 def high_errors():
-    conn = psycopg2.connect(dbname=DB)
+    try:
+        conn = psycopg2.connect(dbname=DB)
+    except:
+        print("ERROR: Unable to connect to database")
+        return
     cur = conn.cursor()
     # I split the query into parts, to make it (slightly more) intelligible.
     # This inner query first strips down the timestamps so that they just
@@ -105,7 +117,7 @@ def high_errors():
         if day[1] >= 0.01:
             the_one_percent.append(day)
     print("")
-    print("Days with high http error rate:")
+    print("Days with high http error rates:")
     # Format the error rate as a readable percent, and convert the date object
     # to a string, again in a readable format.
     for day in the_one_percent:
