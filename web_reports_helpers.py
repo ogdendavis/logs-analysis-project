@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # This file holds helper functions I used while creating the main reports in
 # web_reports
 
