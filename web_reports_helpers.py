@@ -44,16 +44,6 @@ def articles_log_view():
     return rows
 
 
-def test():
-    conn = psycopg2.connect(dbname=DB)
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM log WHERE path LIKE '%bad-things-gone%'")
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    return rows
-
-
 def err_by_date():
     conn = psycopg2.connect(dbname=DB)
     cur = conn.cursor()
