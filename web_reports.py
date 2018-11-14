@@ -125,3 +125,7 @@ def high_errors():
         date = day[0].strftime('%Y-%m-%d')
         print("{0} - {1:.2f}%".format(date, err_rate))
     return
+
+
+if __name__ == '__main__':
+    report()
