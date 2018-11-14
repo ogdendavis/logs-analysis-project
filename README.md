@@ -67,7 +67,7 @@ the command line and run:
 
 ```python
 import web_reports as wr
-wr.reports()
+wr.report()
 ```
 
 You can also run each report by itself:
