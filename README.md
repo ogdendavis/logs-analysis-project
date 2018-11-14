@@ -66,15 +66,16 @@ To execute all of the reports in Web Reports, open the Python Interpreter in
 the command line and run:
 
 ```python
-import web_reports as wr
-wr.report()
+python web_reports()
 ```
 
-You can also run each report by itself:
+You can also import the Web Reports module and run each report by itself:
 ```python
+import web_reports as wr
 wr.top_articles() # Shows top 5 most-viewed articles
 wr.top_authors() # Shows top 5 authors by total page views
 wr.high_errors() # Shows all days with HTTP error rates >= 1% of requests
+wr.report() # Runs all three main reports
 ```
 
 ## Database Structure
